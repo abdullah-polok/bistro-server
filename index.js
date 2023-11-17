@@ -30,6 +30,7 @@ async function run() {
         ///collection
         const menuCollection = client.db('bisttroDb').collection('menu')
         const reviewsCollection = client.db('bisttroDb').collection('reviews')
+        const cartCollection = client.db('bisttroDb').collection('carts')
 
 
 
@@ -49,7 +50,20 @@ async function run() {
         })
 
 
+        ///post api for cart 
+        app.post('/carts', async (req, res) => {
+            const cartItem = req.body;
+            const result = await cartCollection.insertOne(cartItem)
+            res.send(result)
+        })
 
+        ///get email query data of carts
+        app.get('/carts', async (req, res) => {
+            const email = req.query.email
+            const query = { email: email }
+            const result = await cartCollection.find(query).toArray();
+            res.send(result)
+        })
 
 
 
@@ -75,4 +89,9 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Bistro restaurent is running on the port ${port}`)
-}) 
+})
+
+
+
+
+// 
