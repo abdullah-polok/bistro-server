@@ -3,7 +3,7 @@ const cors = require('cors')
 const app = express();
 require('dotenv').config()
 const port = process.env.PORT || 5000
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 ///middle ware
@@ -31,9 +31,25 @@ async function run() {
         const menuCollection = client.db('bisttroDb').collection('menu')
         const reviewsCollection = client.db('bisttroDb').collection('reviews')
         const cartCollection = client.db('bisttroDb').collection('carts')
+        const userCollection = client.db('bisttroDb').collection('users')
 
 
+        ////User related api
+        app.post('/users', async (req, res) => {
+            const user = req.body
+            ///insert email id user doesn't exists:
+            //we can do this many ways (email unique,upsert,simple checking )
 
+            const query = { email: user.email }
+            const existingUser = await userCollection.findOne(query);
+
+            if (existingUser) {
+                return res.send({ message: 'user already exists', insertedId: null })
+
+            }
+            const result = await userCollection.insertOne(user)
+            res.send(result)
+        })
 
 
 
@@ -65,6 +81,13 @@ async function run() {
             res.send(result)
         })
 
+        ///delete specific user in the carts from database
+        app.delete('/carts/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await cartCollection.deleteOne(query)
+            res.send(result)
+        })
 
 
 
