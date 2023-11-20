@@ -49,7 +49,7 @@ async function run() {
 
         ////middleware for verify token
         const verifyToken = (req, res, next) => {
-            const headerTaken = req.headers ///come from local storage which have a access-token
+            const headerTaken = req.headers.authorization ///come from local storage which have a access-token
             console.log(headerTaken)
             if (!req.headers.authorization) {///if authorization token not available
                 return res.status(401).send({ message: 'forbidden access' })
@@ -57,7 +57,14 @@ async function run() {
             // 'split the token  from  Bearer and token'
             const token = req.headers.authorization.split(' ')[1]
 
-            next()
+            ////verify jwt 
+            jwt.verify(token, process.env.Access_TOKEN, (error, decoded) => {
+                if (error) {
+                    return res.status(401).send({ message: 'forbidden access' })
+                }
+                req.decoded = decoded;
+                next()
+            })
         }
 
 
