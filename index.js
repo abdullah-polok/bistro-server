@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const app = express();
+const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const port = process.env.PORT || 5000
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -33,6 +34,18 @@ async function run() {
         const cartCollection = client.db('bisttroDb').collection('carts')
         const userCollection = client.db('bisttroDb').collection('users')
 
+
+
+        ////jwt related api
+        app.post('/jwt', async (req, res) => {
+            const user = req.body  ///come from frontEnd
+            const token = jwt.sign(
+                user,
+                process.env.Access_TOKEN,
+                { expiresIn: '1hr' }
+            )
+            res.send({ token })
+        })
 
 
 
