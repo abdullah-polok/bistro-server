@@ -47,11 +47,29 @@ async function run() {
             res.send({ token })
         })
 
+        ////middleware for verify token
+        const verifyToken = (req, res, next) => {
+            const headerTaken = req.headers ///come from local storage which have a access-token
+            console.log(headerTaken)
+            if (!req.headers.authorization) {///if authorization token not available
+                return res.status(401).send({ message: 'forbidden access' })
+            }
+            // 'split the token  from  Bearer and token'
+            const token = req.headers.authorization.split(' ')[1]
+
+            next()
+        }
+
+
+
+
 
 
         ////User related api
 
-        app.get('/users', async (req, res) => {
+        app.get('/users', verifyToken, async (req, res) => {
+            // const headerTaken = req.headers ///come from local storage which have a access-token
+            // console.log(headerTaken)
             const result = await userCollection.find().toArray()
             res.send(result)
         })
