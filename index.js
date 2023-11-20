@@ -81,6 +81,21 @@ async function run() {
             res.send(result)
         })
 
+        ////check user is admin or not
+        app.get('/user/admin/:email', verifyToken, async (req, res) => {
+            const email = req.params.email;
+            if (email !== req.decoded.email) {
+                return res.status(403).send({ message: 'unauthorized access' })
+            }
+            const query = { email: email };
+            const user = await userCollection.findOne(query)
+            let admin = false;
+            if (user) {
+                admin = user?.role === "admin";
+            }
+            res.send({ admin })
+        })
+
         app.post('/users', async (req, res) => {
             const user = req.body
             ///insert email id user doesn't exists:
